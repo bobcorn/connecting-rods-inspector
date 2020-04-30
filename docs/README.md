@@ -31,7 +31,7 @@ For each connecting rod appearing in the image, the vision system must provide t
 
 ### Part 2
 1. Distracting objects must be ignored.
-2. Touching connecting rods must be recognised separately.
+2. Touching rods must be recognised separately.
 3. Iron powder presence must be managed as to not interfere with the analysis.
 
 ## Benchmarks
