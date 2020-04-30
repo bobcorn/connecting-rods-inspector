@@ -45,7 +45,7 @@ For each connecting rod appearing in the image, the vision system must provide t
 
 ## Usage
 
-Simply run the "main.py" script from terminal (making sure it is located in the same directory as the "images" folder):
+Simply run the "main.py" script from terminal, after making sure that it is located in the same directory as the "images" folder:
 
 ```bash
 python main.py
