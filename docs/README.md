@@ -42,3 +42,17 @@ For each connecting rod appearing in the image, the vision system must provide t
 <p align="center">
   <img src="https://github.com/bobcorn/connecting-rods/blob/master/demo/gifs/full.gif">
 </p>
+
+## Usage
+
+Simply run the "main.py" script from terminal (making sure it is located in the same directory as the "images" folder):
+
+```bash
+python main.py
+```
+
+or:
+
+```bash
+python3 main.py
+```
