@@ -14,7 +14,7 @@ We consider that the following simplistic conditions hold for each image:
 3. Images have been taken by the backlighting technique so to render rods easily distinguishable (i.e. much darker) from background. However, for flexibility reasons the system should not require any change to work properly with lighting sources of different power.
 
 ### Part 2
-We no longer consider the simplistic conditions holding in the previous part:
+We no longer consider the simplistic conditions holding for the previous part:
 
 1. Images may contain other objects (i.e. screws and washers) that need not to be analysed by the system.
 2. Rods can have contact points but do not overlap one to another.
