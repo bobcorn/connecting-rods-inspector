@@ -45,8 +45,14 @@ For each image, the following requirements must be met:
   <img src="https://github.com/bobcorn/connecting-rods/blob/master/demo/gifs/full.gif">
 </p>
 
-## Usage
+## Requirements
+The following Python packages must be installed in order to run the software:
 
+* numpy
+* opencv-python
+* scipy
+
+## Usage
 Simply run the "main.py" script from terminal, after making sure it is located in the same directory of the "images" folder:
 
 ```bash
