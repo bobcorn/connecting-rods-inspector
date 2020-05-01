@@ -1,9 +1,9 @@
-# Visual Inspection of Motorcycle Connecting Rods
+# Connecting Rods Inspection – Computer Vision system for the visual inspection of motorcycle connecting rods
 <p align="center">
   <img src="https://github.com/bobcorn/connecting-rods/blob/master/demo/gifs/rods.gif">
 </p>
 
-Computer Vision system for the visual inspection of motorcycle connecting rods. The system is able to analyse the dimensions of two different types of connecting rods to allow a vision-guided robot to pick and sort rods based on their type and dimensions. The two rod types are characterized by a different number of holes: Type A rods have one hole whilst Type B rods have two holes.
+The system is able to analyse the dimensions of two different types of connecting rods to allow a vision-guided robot to pick and sort rods based on their type and dimensions. The two rod types are characterised by the different number of holes: Type A rods have one hole, whilst Type B rods have two holes.
 
 ## Image characteristics
 ### Part 1
