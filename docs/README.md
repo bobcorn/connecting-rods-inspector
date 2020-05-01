@@ -1,4 +1,4 @@
-# Connecting Rods Inspection – Computer Vision system for the visual inspection of motorcycle connecting rods
+# Connecting Rods Inspector – Computer Vision system for the visual inspection of motorcycle connecting rods
 <p align="center">
   <img src="https://github.com/bobcorn/connecting-rods/blob/master/demo/gifs/rods.gif">
 </p>
