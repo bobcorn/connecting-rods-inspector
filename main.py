@@ -23,6 +23,10 @@ for i, image in enumerate(images):
     # Check for touching objects and separate them if needed, specifying a timeout of 1 iteration (customisable)
     binarized = utils.separate_touching_objects(binarized, 1)
 
+    # We may consider performing a dilation to re-join any unintentionally broken contours by the previous
+    # operation, which may lead to a classification error of the rod type (uncomment to apply)
+    # component = cv2.dilate(component, np.ones((3, 3), np.uint8), iterations=1)
+
     # Create a RGB copy of the current image for visualisation purposes
     display = cv2.cvtColor(binarized.copy(), cv2.COLOR_GRAY2RGB)
 
@@ -35,9 +39,21 @@ for i, image in enumerate(images):
         # Isolate current binarized component
         component = utils.get_component(labels, w)
 
-        # We may consider performing a dilation to re-join any unintentionally broken contours,
-        # which may lead to a classification error of the rod type (uncomment to apply)
-        # component = cv2.dilate(component, np.ones((3, 3), np.uint8), iterations=1)
+        # Perform a second connected components labeling on every (inverted) component to detect holes
+        retval_in, labels_in, stats_in, centroids_in = cv2.connectedComponentsWithStats(255 - component, 4)
+
+        # Initialize an empty array to store holes information
+        holes = []
+
+        # Iterate over the detected inner components to analyse every single hole
+        # (range starts from 2 to exclude outer background)
+        for j in range(2, retval_in):
+            # Get component's diameter
+            diameter = utils.get_hole_diameter(stats_in[j][4])
+
+            # Create and store the hole object into the array
+            hole = (centroids_in[j], diameter)
+            holes.append(hole)
 
         # Compute component's moments and orientation
         moments = cv2.moments(component, True)
@@ -51,50 +67,37 @@ for i, image in enumerate(images):
         mer, length, width = utils.get_oriented_mer(component, angle, centroids[w])
 
         # If current component is not a rod, ignore it
-        if utils.is_not_a_rod(length, width):
+        if utils.is_not_a_rod(length, width, holes):
             continue
 
-        # Assign a random color to the component for visualisation purposes
-        display = utils.color_component(display, labels, w)
+        else:
+            # Assign a random color to the component for visualisation purposes
+            display = utils.color_component(display, labels, w)
 
-        # Draw component's information (centroid, MER and major orientation axis)
-        utils.draw_centroid(display, centroids[w])
-        utils.draw_oriented_mer(display, mer)
-        utils.draw_orientation_axis(display, centroids[w], angle, length)
+            # Iterate over every detected hole to draw its information (not actually needed, just for visualisation)
+            for j in range(2, retval_in):
+                # Isolate current binarized component (not actually needed, just for visualisation)
+                component_in = utils.get_component(labels_in, j)
 
-        # Get component's width at barycenter
-        bar_points, bar_width = utils.get_barycenter_width(component, angle, centroids[w])
-        utils.draw_barycenter_width(display, bar_points)
+                # Compute component's moments and orientation (not actually needed, just for visualisation)
+                moments_in = cv2.moments(component_in, True)
+                angle_in = utils.get_angle(moments_in)
 
-        # Perform a second connected components labeling on every (inverted) component to detect holes
-        retval_in, labels_in, stats_in, centroids_in = cv2.connectedComponentsWithStats(255 - component, 4)
+                # Get component's oriented MER (not actually needed, just for visualisation)
+                mer_in, length_in, width_in = utils.get_oriented_mer(component_in, angle_in, centroids_in[j])
 
-        # Initialize an empty array to store holes information
-        holes = []
+                # Draw component's centroid and MER (not actually needed, just for visualisation)
+                utils.draw_centroid(display, centroids_in[j])
+                utils.draw_oriented_mer(display, mer_in)
 
-        # Iterate over the detected inner components to analyse every single hole
-        # (range starts from 2 to exclude outer background)
-        for j in range(2, retval_in):
-            # Isolate current binarized component (not actually needed, just for visualisation)
-            component_in = utils.get_component(labels_in, j)
+            # Get rod's width at barycenter
+            bar_points, bar_width = utils.get_barycenter_width(component, angle, centroids[w])
 
-            # Compute component's moments and orientation (not actually needed, just for visualisation)
-            moments_in = cv2.moments(component_in, True)
-            angle_in = utils.get_angle(moments_in)
-
-            # Get component's oriented MER (not actually needed, just for visualisation)
-            mer_in, length_in, width_in = utils.get_oriented_mer(component_in, angle_in, centroids_in[j])
-
-            # Get component's diameter
-            diameter = utils.get_hole_diameter(stats_in[j][4])
-
-            # Draw component's information (centroid and MER)
-            utils.draw_centroid(display, centroids_in[j])
-            utils.draw_oriented_mer(display, mer_in)
-
-            # Create and store the hole object into the array
-            hole = (centroids_in[j], diameter)
-            holes.append(hole)
+            # Draw rod's information (centroid, MER, major orientation axis and width at barycenter)
+            utils.draw_centroid(display, centroids[w])
+            utils.draw_oriented_mer(display, mer)
+            utils.draw_orientation_axis(display, centroids[w], angle, length)
+            utils.draw_barycenter_width(display, bar_points)
 
         # Print current rod information and show it
         utils.print_rod_info(centroids[w], mer, angle, length, width, bar_width, holes)

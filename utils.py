@@ -102,14 +102,26 @@ def separate_touching_objects(binarized, timeout):
 
 # Boolean functions
 
-def is_not_a_rod(length, width):
+def is_not_a_rod(length, width, holes):
+    # Object is a screw (or multiple touching screws)
+    if len(holes) == 0:
+        return True
+
+    # Object has too many holes (three or more touching washers)
+    if len(holes) > 2:
+        return True
+
+    # Object is a spurious shape
     if width == 0:
         return True
 
     elongation = length / width
 
-    if 1 < elongation < 2 or elongation > 5:
+    # Object is a washer (or two touching washers)
+    if elongation < 2:
         return True
+
+    return False
 
 
 # Get functions
