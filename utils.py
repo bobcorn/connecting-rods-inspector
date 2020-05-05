@@ -288,9 +288,9 @@ def draw_oriented_mer(image, mer):
     v1, v2, v3, v4 = mer[0], mer[1], mer[2], mer[3]
 
     cv2.line(image, (int(v1[0]), int(v1[1])), (int(v3[0]), int(v3[1])), (255, 255, 255), 1, cv2.LINE_AA)
+    cv2.line(image, (int(v2[0]), int(v2[1])), (int(v1[0]), int(v1[1])), (255, 255, 255), 1, cv2.LINE_AA)
     cv2.line(image, (int(v3[0]), int(v3[1])), (int(v4[0]), int(v4[1])), (255, 255, 255), 1, cv2.LINE_AA)
     cv2.line(image, (int(v4[0]), int(v4[1])), (int(v2[0]), int(v2[1])), (255, 255, 255), 1, cv2.LINE_AA)
-    cv2.line(image, (int(v2[0]), int(v2[1])), (int(v1[0]), int(v1[1])), (255, 255, 255), 1, cv2.LINE_AA)
 
 
 def draw_orientation_axis(image, centroid, angle, length):
