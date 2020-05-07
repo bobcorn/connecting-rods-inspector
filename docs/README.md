@@ -37,6 +37,8 @@ For each image, the following requirements must be met:
 3. Iron powder presence must be managed as to not interfere with the analysis.
 
 ## Benchmarks
+Performances are based on processor Intel Core i5 Dual-Core 2,7 GHz.
+
 33 FPS (on average)
 
 ## Full demo
