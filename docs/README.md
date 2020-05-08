@@ -3,9 +3,11 @@
   <img src="https://github.com/bobcorn/connecting-rods/blob/master/demo/gifs/rods.gif">
 </p>
 
-The system is able to analyse the dimensions of two different types of connecting rods to allow a vision-guided robot to pick and sort rods based on their type and dimensions. The two rod types are characterised by the different number of holes: Type A rods have one hole, whilst Type B rods have two holes.
+Computer Vision system that is able to analyse the dimensions of two different types of connecting rods to allow a vision-guided robot to pick and sort rods based on their type and dimensions.
 
 ## Image characteristics
+Rods appearing in the images are characterised by the different number of holes: type "A" rods have one hole, whilst type "B" rods have two holes.
+
 ### Part 1
 We consider that the following simplistic conditions hold for each image:
 
