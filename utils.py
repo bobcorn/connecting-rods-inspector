@@ -1,9 +1,22 @@
+#!/usr/bin/env python
+"""
+Utility functions file.
+"""
+
 import glob
 import cv2
 import numpy as np
 import math
 from scipy.spatial import distance as dist
 from scipy.optimize import linear_sum_assignment
+
+__author__ = "Marco Rossini"
+__copyright__ = "Copyright 2020, Marco Rossini"
+__date__ = "2020/05"
+__license__ = "MIT"
+__version__ = "1.0"
+
+# ----------------------------------------------------------------------------------------------------------------------
 
 # This constant is based on the maximum empirically detected area: 5293
 MAX_ROD_AREA = 6000
@@ -355,7 +368,7 @@ def print_image_info(file_name):
 
 # Show functions
 
-def show_image(name, image, x, y):
+def show_image(name, image, x=0, y=0):
     cv2.imshow(name, image)
     cv2.moveWindow(name, x, y)
     cv2.waitKey()

@@ -1,6 +1,19 @@
+#!/usr/bin/env python
+"""
+Main execution file.
+"""
+
 import cv2
 import utils
 import numpy as np
+
+__author__ = "Marco Rossini"
+__copyright__ = "Copyright 2020, Marco Rossini"
+__date__ = "2020/05"
+__license__ = "MIT"
+__version__ = "1.0"
+
+# ----------------------------------------------------------------------------------------------------------------------
 
 # Read and store all images into an array
 images, file_names = utils.get_images_as_array()
@@ -8,7 +21,7 @@ images, file_names = utils.get_images_as_array()
 # Iterate over all images
 for i, image in enumerate(images):
     # Show current image and print its name
-    utils.show_image(file_names[i], image, 0, 0)
+    utils.show_image(file_names[i], image)
     utils.print_image_info(file_names[i])
 
     # Apply a median blur four times to remove disturbing dust and refine edges
@@ -18,7 +31,7 @@ for i, image in enumerate(images):
     threshold, binarized = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
     # Show binarized image
-    utils.show_image(file_names[i], binarized, 0, 0)
+    utils.show_image(file_names[i], binarized)
 
     # Check for touching objects and separate them if needed, specifying a timeout of 1 iteration (customisable)
     binarized = utils.separate_touching_objects(binarized, 1)
@@ -101,4 +114,4 @@ for i, image in enumerate(images):
 
         # Print current rod information and show it
         utils.print_rod_info(centroids[w], mer, angle, length, width, bar_width, holes)
-        utils.show_image(file_names[i], display, 0, 0)
+        utils.show_image(file_names[i], display)
