@@ -158,34 +158,46 @@ def get_angle(moments):
     if (moments['mu20'] - moments['mu02']) == 0:
         return None
 
+    # Get theta as first derivative
     theta = -0.5 * math.atan(2 * moments['mu11'] / (moments['mu20'] - moments['mu02']))
+
+    # Analyse second derivative to discriminate major/minor axis
     d2theta = 2 * (moments['mu20'] - moments['mu02']) * math.cos(2 * theta) - 4 * moments['mu11'] * math.sin(
         2 * theta)
 
     if d2theta > 0:
+        # Minimum -> theta is major axis
         return theta
     else:
+        # Maximum -> theta is minor axis
         return theta + math.pi / 2
 
 
 def get_oriented_mer(component, angle, centroid):
+    # Calculate alpha and beta
     alpha = -math.sin(angle)
     beta = math.cos(angle)
+
+    # Get major and minor axis
     major = (alpha, -beta, beta * centroid[1] - alpha * centroid[0])
     minor = (beta, alpha, -beta * centroid[0] - alpha * centroid[1])
 
-    # MER contact points to be detected
+    # MER contact points (to be detected)
     c1 = c2 = c3 = c4 = (0, 0)
 
+    # Max and min values initialised as limit values
     max_c1_maj = max_c3_min = float("-inf")
     min_c2_maj = min_c4_min = float("inf")
 
+    # Get object contour
     contours, _ = cv2.findContours(component, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
+    # Iterate over contour points only (since contact points belong to them)
     for p in contours[0]:
         x = p[0][0]
         y = p[0][1]
 
+        # Calculate signed distances between major and minor axis
         dist_maj = (major[0] * x + major[1] * y + major[2]) / math.sqrt(major[0] ** 2 + major[1] ** 2)
         dist_min = (minor[0] * x + minor[1] * y + minor[2]) / math.sqrt(minor[0] ** 2 + minor[1] ** 2)
 
@@ -193,36 +205,55 @@ def get_oriented_mer(component, angle, centroid):
         if dist_maj > max_c1_maj:
             c1 = (x, y)
             max_c1_maj = dist_maj
+
         # If distance from the major axis is less than the minimum ever encountered
         if dist_maj < min_c2_maj:
             c2 = (x, y)
             min_c2_maj = dist_maj
+
         # If distance from the minor axis is greater than the maximum ever encountered
         if dist_min > max_c3_min:
             c3 = (x, y)
             max_c3_min = dist_min
+
         # If distance from the minor axis is less than the minimum ever encountered
         if dist_min < min_c4_min:
             c4 = (x, y)
             min_c4_min = dist_min
 
-    line_c1 = (alpha / beta, c1[1] - alpha / beta * c1[0])
-    line_c2 = (alpha / beta, c2[1] - alpha / beta * c2[0])
-    line_c3 = (-beta / alpha, c3[1] + beta / alpha * c3[0])
-    line_c4 = (-beta / alpha, c4[1] + beta / alpha * c4[0])
+    # Declare a, b, a', b'
+    a = alpha
+    b = -beta
+    a_p = beta
+    b_p = alpha
 
-    temp_x = (line_c1[1] - line_c3[1]) / (line_c3[0] - line_c1[0])
-    v1 = (temp_x, line_c1[0] * temp_x + line_c1[1])
-    temp_x = (line_c1[1] - line_c4[1]) / (line_c4[0] - line_c1[0])
-    v2 = (temp_x, line_c1[0] * temp_x + line_c1[1])
+    # Calculate 'c' coefficients for lines of MER's sides
+    cl_1 = -(a * c1[0] + b * c1[1])
+    cl_2 = -(a * c2[0] + b * c2[1])
+    cw_1 = -(a_p * c3[0] + b_p * c3[1])
+    cw_2 = -(a_p * c4[0] + b_p * c4[1])
 
-    temp_x = (line_c2[1] - line_c3[1]) / (line_c3[0] - line_c2[0])
-    v3 = (temp_x, line_c2[0] * temp_x + line_c2[1])
-    temp_x = (line_c2[1] - line_c4[1]) / (line_c4[0] - line_c2[0])
-    v4 = (temp_x, line_c2[0] * temp_x + line_c2[1])
+    # Calculate vertices
+    v1_x = (b * cw_1 - b_p * cl_1) / (a * b_p - b * a_p)
+    v1_y = (a_p * cl_1 - a * cw_1) / (a * b_p - b * a_p)
+    v1 = (v1_x, v1_y)
 
+    v2_x = (b * cw_2 - b_p * cl_1) / (a * b_p - b * a_p)
+    v2_y = (a_p * cl_1 - a * cw_2) / (a * b_p - b * a_p)
+    v2 = (v2_x, v2_y)
+
+    v3_x = (b * cw_1 - b_p * cl_2) / (a * b_p - b * a_p)
+    v3_y = (a_p * cl_2 - a * cw_1) / (a * b_p - b * a_p)
+    v3 = (v3_x, v3_y)
+
+    v4_x = (b * cw_2 - b_p * cl_2) / (a * b_p - b * a_p)
+    v4_y = (a_p * cl_2 - a * cw_2) / (a * b_p - b * a_p)
+    v4 = (v4_x, v4_y)
+
+    # Declare MER as the quadruple of vertices
     mer = (v1, v2, v3, v4)
 
+    # Calculate length and width as euclidean distance
     length = math.sqrt((v1[0] - v2[0]) ** 2 + (v1[1] - v2[1]) ** 2)
     width = math.sqrt((v1[0] - v3[0]) ** 2 + (v1[1] - v3[1]) ** 2)
 
@@ -230,37 +261,49 @@ def get_oriented_mer(component, angle, centroid):
 
 
 def get_barycenter_width(component, angle, centroid):
+    # Calculate alpha and beta
     alpha = -math.sin(angle)
     beta = math.cos(angle)
+
+    # Get major and minor axis
     major = (alpha, -beta, beta * centroid[1] - alpha * centroid[0])
     minor = (beta, alpha, -beta * centroid[0] - alpha * centroid[1])
 
-    bp1 = bp2 = (0, 0)
-    min_bp1 = min_bp2 = float("inf")
+    # Points at barycenter width (to be detected)
+    wb_1 = wb_2 = (0, 0)
+    min_wb_1 = min_wb_2 = float("inf")
 
+    # Get object contour
     contours, _ = cv2.findContours(component, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
+    # Iterate over contour points only (since points at barycenter width belong to them)
     for p in contours[0]:
         x = p[0][0]
         y = p[0][1]
+
+        # Calculate signed distances between major and minor axis
         dist_maj = (major[0] * x + major[1] * y + major[2]) / math.sqrt(major[0] ** 2 + major[1] ** 2)
         dist_min = (minor[0] * x + minor[1] * y + minor[2]) / math.sqrt(minor[0] ** 2 + minor[1] ** 2)
 
         # If the absolute distance from the minor axis is less than the minimum ever encountered
-        # for bp1 AND the distance from the major axis is positive
-        if abs(dist_min) < min_bp1 and dist_maj > 0:
-            bp1 = (x, y)
-            min_bp1 = abs(dist_min)
+        # for wb_1 AND the distance from the major axis is positive
+        if abs(dist_min) < min_wb_1 and dist_maj > 0:
+            wb_1 = (x, y)
+            min_wb_1 = abs(dist_min)
+
         # If the absolute distance from the minor axis is less than the minimum ever encountered
-        # for bp2 AND the distance from the major axis is negative
-        if abs(dist_min) < min_bp2 and dist_maj < 0:
-            bp2 = (x, y)
-            min_bp2 = abs(dist_min)
+        # for wb_2 AND the distance from the major axis is negative
+        if abs(dist_min) < min_wb_2 and dist_maj < 0:
+            wb_2 = (x, y)
+            min_wb_2 = abs(dist_min)
 
-    width = math.sqrt((bp1[0] - bp2[0]) ** 2 + (bp1[1] - bp2[1]) ** 2)
-    bar_points = [bp1, bp2]
+    # Calculate width as euclidean distance
+    width = math.sqrt((wb_1[0] - wb_2[0]) ** 2 + (wb_1[1] - wb_2[1]) ** 2)
 
-    return bar_points, width
+    # Declare the double of points at barycenter width
+    wb_points = [wb_1, wb_2]
+
+    return wb_points, width
 
 
 def get_convexity_points(component):
