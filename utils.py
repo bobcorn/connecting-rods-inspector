@@ -233,7 +233,7 @@ def get_oriented_mer(component, angle, centroid):
     cw_1 = -(a_p * c3[0] + b_p * c3[1])
     cw_2 = -(a_p * c4[0] + b_p * c4[1])
 
-    # Calculate vertices
+    # Calculate MER vertices
     v1_x = (b * cw_1 - b_p * cl_1) / (a * b_p - b * a_p)
     v1_y = (a_p * cl_1 - a * cw_1) / (a * b_p - b * a_p)
     v1 = (v1_x, v1_y)
@@ -325,6 +325,7 @@ def get_convexity_points(component):
 
 def get_hole_diameter(area):
     diameter = 2 * math.sqrt(area / math.pi)
+    
     return diameter
 
 
